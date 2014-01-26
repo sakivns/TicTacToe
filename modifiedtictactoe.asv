@@ -1,0 +1,72 @@
+function [stateset,state,winner] = modifiedtictactoe()
+    % Setup the figure/windows for the game
+    clear all
+    
+    is_x = round; % keeps track of the current player
+    state = [[-1 -1 -1]
+             [-1 -1 -1]
+             [-1 -1 -1]]; % the state of the game (-1 none, 0 = O, 1 = X)
+    winner = -1; % is there a winner? is it a tie?
+    stateset = [];
+    % The main game loop. Continue until the game ends with winner ~= -1
+    while winner == -1
+        next = play(is_x, state); % play a single round
+        if next == -1 % if the player clicks on a filled in slot, ask them to try again
+           continue;
+           
+        else
+           state = next; % advance the current state
+           stateset = [stateset state];
+           is_x = mod(is_x + 1,2); % pick the next player and update the player label
+           
+           winner = won(state); % check to see if the game is in a winning state
+        end
+    end
+    
+end
+ 
+% The state function takes in the current player and the previous state the
+% game is in and simulates a single round.
+function state = play(is_x, state)
+    row = round(rand*2);
+    col = round(rand*2);% get the mouse position with respect to the plot
+     % get the corresponding row/col (note row starts off with 0 at the bottom)
+    if state(col+1, row+1) ~= -1 % if the player tries to click on a filled spot
+       state = -1; % invalid, ask the player to try again
+    else
+        state(col+1, row+1) = is_x; % set the state and draw the X and the O
+        
+    end
+end
+ 
+
+% The won function calculates if the current game state is in a winning
+% state.
+function won = won(state)
+    % Horizontal
+    if (state(1,1) == state(1,2) && state(1,1) == state(1,3) && state(1,1) ~= -1)
+        won = state(1,1);
+    elseif (state(2,1) == state(2,2) && state(2,1) == state(2,3) && state(2,1) ~= -1)
+        won = state(2,1);
+    elseif (state(3,1) == state(3,2) && state(3,1) == state(3,3) && state(3,1) ~= -1)
+        won = state(3,1);
+    % Vertical
+    elseif (state(1,1) == state(2,1) && state(1,1) == state(3,1) && state(3,1) ~= -1) 
+        won = state(1,1);
+    elseif (state(1,2) == state(2,2) && state(1,2) == state(3,2) && state(1,2) ~= -1) 
+        won = state(1,2);
+    elseif (state(1,3) == state(2,3) && state(1,3) == state(3,3) && state(1,3) ~= -1) 
+        won = state(1,3);
+    % Diagonal
+    elseif (state(1,1) == state(2,2) && state(1,1) == state(3,3) && state(1,1) ~= -1)
+        won = state(1,1);
+    elseif (state(1,3) == state(2,2) && state(1,3) == state(3,1) && state(2,2) ~= -1)
+        won = state(1,3);
+    % If no more slots are open, it's a tie
+    elseif ~ismember(state, -1)
+        won = 2;
+    else
+        won = -1;
+    end
+end
+ 
